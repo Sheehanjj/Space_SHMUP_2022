@@ -10,9 +10,12 @@ public class Hero : MonoBehaviour
 	public float speed = 30;
 	public float rollMult = -45;
 	public float pitchMult = 30;
+	public float gameRestartDelay = 2f;
 	
 	[Header("Set Dynamically")]
-	public float shieldLevel = 1;
+	[SerializeField]
+	public float _shieldLevel = 1;
+	private GameObject lastTriggerGo = null;
 	
 	void Awake(){
 		if (S==null){
@@ -26,7 +29,7 @@ public class Hero : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        print("Print to Console!");
     }
 
     // Update is called once per frame
@@ -44,4 +47,37 @@ public class Hero : MonoBehaviour
 	transform.rotation = Quaternion.Euler(yAxis*pitchMult,xAxis*rollMult,0);
         
     }
+	
+	void OnTriggerEnter(Collider other){
+		print("Collision Detected!");
+		Transform rootT = other.gameObject.transform.root;
+		GameObject go = rootT.gameObject;
+		//print("Triggered: "+go.name);
+		// Make sure it's not the same triggering go as last time
+		if (go == lastTriggerGo) { // c
+		return;
+		}
+		lastTriggerGo = go; // d
+		if (go.tag == "Enemy") { // If the shield was triggered by an enemy
+		shieldLevel--; // Decrease the level of the shield by 1
+		Destroy(go); // … and Destroy the enemy // e
+		} else {
+			print( "Triggered by non-Enemy: "+go.name); // f
+			}
+		}
+
+		public float shieldLevel {
+			get{
+				return(_shieldLevel);
+			}
+			set{
+				_shieldLevel = Mathf.Min(value,4);
+				if (value < 0) {
+				   Destroy(this.gameObject);
+				   Main.S.DelayedRestart(gameRestartDelay);
+				}
+			}
+	}
+			
+		
 }
