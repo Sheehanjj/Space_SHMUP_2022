@@ -85,7 +85,7 @@ public class Hero : MonoBehaviour
 			set{
 				_shieldLevel = Mathf.Min(value,4);
 				if (value < 0) {
-				   Destroy(this.gameObject);
+				   //Destroy(this.gameObject);
 				   Main.S.DelayedRestart(gameRestartDelay);
 				}
 			}
